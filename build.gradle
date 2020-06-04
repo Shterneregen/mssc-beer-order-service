@@ -30,6 +30,7 @@ repositories {
 dependencies {
     implementation(
             "org.springframework.boot:spring-boot-starter-actuator",
+            "org.springframework.boot:spring-boot-starter-artemis",
             "org.springframework.boot:spring-boot-starter-data-jpa",
             "org.springframework.boot:spring-boot-starter-web",
             "org.mapstruct:mapstruct:$mapstructVersion"
