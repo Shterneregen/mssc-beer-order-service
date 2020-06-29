@@ -19,6 +19,7 @@ import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.NEW;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.PICKED_UP;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATED;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATION_EXCEPTION;
+import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATION_PENDING;
 
 @Configuration
 @EnableStateMachineFactory
@@ -40,7 +41,7 @@ public class BeerOrderStateMachineConfig
     @Override
     public void configure(StateMachineTransitionConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> transitions) throws Exception {
         transitions
-                .withExternal().source(NEW).target(NEW).event(VALIDATE_ORDER).and()
+                .withExternal().source(NEW).target(VALIDATION_PENDING).event(VALIDATE_ORDER).and()
                 .withExternal().source(NEW).target(VALIDATED).event(VALIDATION_PASSED).and()
                 .withExternal().source(NEW).target(VALIDATION_EXCEPTION).event(VALIDATION_FAILED);
     }
