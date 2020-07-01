@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/Shterneregen/mssc-beer-order-service.svg?style=svg)](https://circleci.com/gh/Shterneregen/mssc-beer-order-service)
 # MSSC Beer Order Service
 
 Spring Boot Microservice example
