@@ -16,12 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.ALLOCATE_ORDER;
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.VALIDATE_ORDER;
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.VALIDATION_FAILED;
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.VALIDATION_PASSED;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.NEW;
-import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATED;
-import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATION_EXCEPTION;
 
 @RequiredArgsConstructor
 @Service
@@ -44,15 +43,18 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
         return savedBeerOrder;
     }
 
-    @Transactional
     @Override
-    public BeerOrder validateBeerOrder(UUID orderId, boolean isValid) {
-        BeerOrder beerOrder = beerOrderRepository.getOne(orderId);
-        beerOrder.setOrderStatus(isValid ? VALIDATED : VALIDATION_EXCEPTION);
-        BeerOrder savedBeerOrder = beerOrderRepository.save(beerOrder);
+    public void processValidationResult(UUID beerOrderId, boolean isValid) {
+        BeerOrder beerOrder = beerOrderRepository.getOne(beerOrderId);
+        if(isValid){
+            sendBeerOrderEvent(beerOrder, VALIDATION_PASSED);
 
-        sendBeerOrderEvent(savedBeerOrder, isValid ? VALIDATION_PASSED : VALIDATION_FAILED);
-        return beerOrder;
+            BeerOrder validatedOrder = beerOrderRepository.findOneById(beerOrderId);
+
+            sendBeerOrderEvent(validatedOrder, ALLOCATE_ORDER);
+        } else {
+            sendBeerOrderEvent(beerOrder, VALIDATION_FAILED);
+        }
     }
 
     private void sendBeerOrderEvent(BeerOrder beerOrder, BeerOrderEventEnum eventEnum) {

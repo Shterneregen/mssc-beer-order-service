@@ -20,6 +20,6 @@ public class BeerOrderValidationResultListener {
     public void listenOrderValidationResult(ValidateOrderResult validateOrderResult) {
         log.debug("Validate order result [{}] for order [{}]",
                 validateOrderResult.isValid(), validateOrderResult.getId());
-        beerOrderManager.validateBeerOrder(validateOrderResult.getId(), validateOrderResult.isValid());
+        beerOrderManager.processValidationResult(validateOrderResult.getId(), validateOrderResult.isValid());
     }
 }
