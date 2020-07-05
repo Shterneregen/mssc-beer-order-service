@@ -13,13 +13,19 @@ import org.springframework.statemachine.config.builders.StateMachineTransitionCo
 import java.util.EnumSet;
 
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.ALLOCATE_ORDER;
+import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.ALLOCATION_FAILED;
+import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.ALLOCATION_NO_INVENTORY;
+import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.ALLOCATION_SUCCESS;
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.VALIDATE_ORDER;
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.VALIDATION_FAILED;
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.VALIDATION_PASSED;
+import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.ALLOCATED;
+import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.ALLOCATION_EXCEPTION;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.ALLOCATION_PENDING;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.DELIVERED;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.DELIVERY_EXCEPTION;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.NEW;
+import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.PENDING_INVENTORY;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.PICKED_UP;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATED;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATION_EXCEPTION;
@@ -29,29 +35,32 @@ import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATION_
 @Configuration
 @EnableStateMachineFactory
 public class BeerOrderStateMachineConfig
-        extends StateMachineConfigurerAdapter<BeerOrderStatusEnum, BeerOrderEventEnum> {
+		extends StateMachineConfigurerAdapter<BeerOrderStatusEnum, BeerOrderEventEnum> {
 
-    private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateOrderAction;
-    private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocateOrderAction;
+	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateOrderAction;
+	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocateOrderAction;
 
-    @Override
-    public void configure(StateMachineStateConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> states) throws Exception {
-        states.withStates()
-                .initial(NEW)
-                .states(EnumSet.allOf(BeerOrderStatusEnum.class))
-                .end(DELIVERED)
-                .end(PICKED_UP)
-                .end(DELIVERY_EXCEPTION)
-                .end(VALIDATED)
-                .end(VALIDATION_EXCEPTION);
-    }
+	@Override
+	public void configure(StateMachineStateConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> states) throws Exception {
+		states.withStates()
+				.initial(NEW)
+				.states(EnumSet.allOf(BeerOrderStatusEnum.class))
+				.end(DELIVERED)
+				.end(PICKED_UP)
+				.end(DELIVERY_EXCEPTION)
+				.end(VALIDATED)
+				.end(VALIDATION_EXCEPTION);
+	}
 
-    @Override
-    public void configure(StateMachineTransitionConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> transitions) throws Exception {
-        transitions
-                .withExternal().source(NEW).target(VALIDATION_PENDING).event(VALIDATE_ORDER).action(validateOrderAction).and()
-                .withExternal().source(NEW).target(VALIDATED).event(VALIDATION_PASSED).and()
-                .withExternal().source(NEW).target(VALIDATION_EXCEPTION).event(VALIDATION_FAILED).and()
-                .withExternal().source(VALIDATED).target(ALLOCATION_PENDING).event(ALLOCATE_ORDER).action(allocateOrderAction);
-    }
+	@Override
+	public void configure(StateMachineTransitionConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> transitions) throws Exception {
+		transitions
+				.withExternal().source(NEW).target(VALIDATION_PENDING).event(VALIDATE_ORDER).action(validateOrderAction).and()
+				.withExternal().source(NEW).target(VALIDATED).event(VALIDATION_PASSED).and()
+				.withExternal().source(NEW).target(VALIDATION_EXCEPTION).event(VALIDATION_FAILED).and()
+				.withExternal().source(VALIDATED).target(ALLOCATION_PENDING).event(ALLOCATE_ORDER).action(allocateOrderAction).and()
+				.withExternal().source(ALLOCATION_PENDING).target(ALLOCATED).event(ALLOCATION_SUCCESS).and()
+				.withExternal().source(ALLOCATION_PENDING).target(ALLOCATION_EXCEPTION).event(ALLOCATION_FAILED).and()
+				.withExternal().source(ALLOCATION_PENDING).target(PENDING_INVENTORY).event(ALLOCATION_NO_INVENTORY);
+	}
 }
