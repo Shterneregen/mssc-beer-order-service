@@ -56,8 +56,8 @@ public class BeerOrderStateMachineConfig
 	public void configure(StateMachineTransitionConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> transitions) throws Exception {
 		transitions
 				.withExternal().source(NEW).target(VALIDATION_PENDING).event(VALIDATE_ORDER).action(validateOrderAction).and()
-				.withExternal().source(NEW).target(VALIDATED).event(VALIDATION_PASSED).and()
-				.withExternal().source(NEW).target(VALIDATION_EXCEPTION).event(VALIDATION_FAILED).and()
+				.withExternal().source(VALIDATION_PENDING).target(VALIDATED).event(VALIDATION_PASSED).and()
+				.withExternal().source(VALIDATION_PENDING).target(VALIDATION_EXCEPTION).event(VALIDATION_FAILED).and()
 				.withExternal().source(VALIDATED).target(ALLOCATION_PENDING).event(ALLOCATE_ORDER).action(allocateOrderAction).and()
 				.withExternal().source(ALLOCATION_PENDING).target(ALLOCATED).event(ALLOCATION_SUCCESS).and()
 				.withExternal().source(ALLOCATION_PENDING).target(ALLOCATION_EXCEPTION).event(ALLOCATION_FAILED).and()

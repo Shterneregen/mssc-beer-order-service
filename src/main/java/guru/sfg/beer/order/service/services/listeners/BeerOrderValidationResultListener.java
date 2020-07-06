@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import static guru.sfg.beer.order.service.config.JmsConfig.VALIDATE_ORDER_RESULT_QUEUE;
+import static guru.sfg.beer.order.service.config.JmsConfig.VALIDATE_ORDER_RESPONSE_QUEUE;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -16,7 +16,7 @@ public class BeerOrderValidationResultListener {
 
     private final BeerOrderManager beerOrderManager;
 
-    @JmsListener(destination = VALIDATE_ORDER_RESULT_QUEUE)
+    @JmsListener(destination = VALIDATE_ORDER_RESPONSE_QUEUE)
     public void listenOrderValidationResult(ValidateOrderResult validateOrderResult) {
         log.debug("Validate order result [{}] for order [{}]",
                 validateOrderResult.isValid(), validateOrderResult.getId());

@@ -14,7 +14,7 @@ ext {
 group = "guru.springframework"
 version = "0.0.1-SNAPSHOT"
 description = "mssc-beer-order-service"
-sourceCompatibility = "1.8"
+sourceCompatibility = "11"
 
 configurations {
     compileOnly {
@@ -25,6 +25,7 @@ configurations {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -34,7 +35,7 @@ dependencies {
             "org.springframework.boot:spring-boot-starter-data-jpa",
             "org.springframework.boot:spring-boot-starter-web",
             "org.mapstruct:mapstruct:$mapstructVersion",
-            'org.springframework.statemachine:spring-statemachine-core:2.2.0.RELEASE'
+            "org.springframework.statemachine:spring-statemachine-core:2.2.0.RELEASE"
     )
     compileOnly "org.projectlombok:lombok"
     runtimeOnly(
@@ -49,8 +50,18 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude group: "org.junit.vintage", module: "junit-vintage-engine"
     }
-    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
-    testAnnotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    testImplementation(
+            "org.mockito:mockito-junit-jupiter:$mockitoVersion",
+            "org.apache.activemq:artemis-jms-server:2.12.0",
+            "org.awaitility:awaitility:3.1.6",
+            "org.projectlombok:lombok",
+            "com.github.jenspiegsa:wiremock-extension:0.4.0"
+    )
+    testAnnotationProcessor(
+            "org.projectlombok:lombok",
+            "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    )
+    testRuntimeOnly 'com.h2database:h2'
 }
 
 test {

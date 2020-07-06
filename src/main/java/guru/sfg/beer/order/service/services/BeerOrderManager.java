@@ -9,7 +9,7 @@ public interface BeerOrderManager {
 
 	BeerOrder newBeerOrder(BeerOrder beerOrder);
 
-	void processValidationResult(UUID orderId, boolean isValid);
+	void processValidationResult(UUID orderId, Boolean isValid);
 
 	void beerOrderAllocationPassed(BeerOrderDto beerOrder);
 
