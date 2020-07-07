@@ -61,7 +61,6 @@ dependencies {
             "org.projectlombok:lombok",
             "org.mapstruct:mapstruct-processor:$mapstructVersion"
     )
-    testRuntimeOnly 'com.h2database:h2'
 }
 
 test {

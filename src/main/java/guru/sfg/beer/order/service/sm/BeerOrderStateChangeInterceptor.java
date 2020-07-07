@@ -4,7 +4,6 @@ import guru.sfg.beer.order.service.domain.BeerOrder;
 import guru.sfg.beer.order.service.domain.BeerOrderEventEnum;
 import guru.sfg.beer.order.service.domain.BeerOrderStatusEnum;
 import guru.sfg.beer.order.service.repositories.BeerOrderRepository;
-import guru.sfg.beer.order.service.services.BeerOrderManagerImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -18,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+import static guru.sfg.beer.order.service.services.BeerOrderManagerImpl.ORDER_ID_HEADER;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -28,10 +29,13 @@ public class BeerOrderStateChangeInterceptor
 
 	@Transactional
 	@Override
-	public void preStateChange(State<BeerOrderStatusEnum, BeerOrderEventEnum> state, Message<BeerOrderEventEnum> message, Transition<BeerOrderStatusEnum, BeerOrderEventEnum> transition, StateMachine<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachine) {
+	public void preStateChange(State<BeerOrderStatusEnum, BeerOrderEventEnum> state,
+							   Message<BeerOrderEventEnum> message, Transition<BeerOrderStatusEnum,
+			BeerOrderEventEnum> transition, StateMachine<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachine) {
+
 		log.debug("Pre-State Change");
 		Optional.ofNullable(message)
-				.flatMap(msg -> Optional.ofNullable((String) msg.getHeaders().getOrDefault(BeerOrderManagerImpl.ORDER_ID_HEADER, " ")))
+				.flatMap(msg -> Optional.ofNullable((String) msg.getHeaders().getOrDefault(ORDER_ID_HEADER, " ")))
 				.ifPresent(orderId -> {
 					log.debug("Saving state for order id: {} Status: {}", orderId, state.getId());
 
