@@ -37,7 +37,7 @@ public class BeerOrderStateChangeInterceptor
 		Optional.ofNullable(message)
 				.flatMap(msg -> Optional.ofNullable((String) msg.getHeaders().getOrDefault(ORDER_ID_HEADER, " ")))
 				.ifPresent(orderId -> {
-					log.debug("Saving state for order id: {} Status: {}", orderId, state.getId());
+					log.debug("Saving state for order [{}], Status [{}]", orderId, state.getId());
 
 					BeerOrder beerOrder = beerOrderRepository.getOne(UUID.fromString(orderId));
 					beerOrder.setOrderStatus(state.getId());

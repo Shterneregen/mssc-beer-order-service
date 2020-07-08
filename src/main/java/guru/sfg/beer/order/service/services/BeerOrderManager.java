@@ -11,6 +11,8 @@ public interface BeerOrderManager {
 
 	void processValidationResult(UUID orderId, Boolean isValid);
 
+	void processValidationPassed(UUID beerOrderId);
+
 	void beerOrderAllocationPassed(BeerOrderDto beerOrder);
 
 	void beerOrderAllocationPendingInventory(BeerOrderDto beerOrder);

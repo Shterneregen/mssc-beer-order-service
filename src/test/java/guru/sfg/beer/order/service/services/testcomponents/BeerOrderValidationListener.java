@@ -22,9 +22,11 @@ public class BeerOrderValidationListener {
 		boolean isValid = true;
 
 		ValidateOrderRequest request = (ValidateOrderRequest) msg.getPayload();
+		log.debug("Validate order test listener for order [{}]", request.getBeerOrderDto().getId());
 
 		// condition to fail validation
 		if ("fail-validation".equals(request.getBeerOrderDto().getCustomerRef())) {
+			log.debug("Order is not valid");
 			isValid = false;
 		}
 

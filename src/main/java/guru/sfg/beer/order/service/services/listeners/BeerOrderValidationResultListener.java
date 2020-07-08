@@ -18,7 +18,7 @@ public class BeerOrderValidationResultListener {
 
     @JmsListener(destination = VALIDATE_ORDER_RESPONSE_QUEUE)
     public void listenOrderValidationResult(ValidateOrderResult validateOrderResult) {
-        log.debug("Validate order result [{}] for order [{}]",
+        log.debug("Validate order result listener: result [{}] order [{}]",
                 validateOrderResult.getIsValid(), validateOrderResult.getOrderId());
         beerOrderManager.processValidationResult(validateOrderResult.getOrderId(), validateOrderResult.getIsValid());
     }

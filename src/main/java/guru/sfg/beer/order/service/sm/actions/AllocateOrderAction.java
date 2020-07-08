@@ -30,6 +30,7 @@ public class AllocateOrderAction implements Action<BeerOrderStatusEnum, BeerOrde
 	@Override
 	public void execute(StateContext<BeerOrderStatusEnum, BeerOrderEventEnum> context) {
 		String beerOrderId = (String) context.getMessage().getHeaders().get(BeerOrderManagerImpl.ORDER_ID_HEADER);
+		log.debug("Allocate order action for order [{}]", beerOrderId);
 		Optional<BeerOrder> beerOrderOptional = beerOrderRepository.findById(UUID.fromString(beerOrderId));
 
 		beerOrderOptional.ifPresentOrElse(beerOrder -> {
