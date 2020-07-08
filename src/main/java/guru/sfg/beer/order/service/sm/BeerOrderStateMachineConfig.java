@@ -40,6 +40,7 @@ public class BeerOrderStateMachineConfig
 
 	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateOrderAction;
 	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocateOrderAction;
+	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateFailureAction;
 
 	@Override
 	public void configure(StateMachineStateConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> states) throws Exception {
@@ -58,7 +59,7 @@ public class BeerOrderStateMachineConfig
 		transitions
 				.withExternal().source(NEW).target(VALIDATION_PENDING).event(VALIDATE_ORDER).action(validateOrderAction).and()
 				.withExternal().source(VALIDATION_PENDING).target(VALIDATED).event(VALIDATION_PASSED).and()
-				.withExternal().source(VALIDATION_PENDING).target(VALIDATION_EXCEPTION).event(VALIDATION_FAILED).and()
+				.withExternal().source(VALIDATION_PENDING).target(VALIDATION_EXCEPTION).event(VALIDATION_FAILED).action(validateFailureAction).and()
 				.withExternal().source(VALIDATED).target(ALLOCATION_PENDING).event(ALLOCATE_ORDER).action(allocateOrderAction).and()
 				.withExternal().source(ALLOCATION_PENDING).target(ALLOCATED).event(ALLOCATION_SUCCESS).and()
 				.withExternal().source(ALLOCATION_PENDING).target(ALLOCATION_EXCEPTION).event(ALLOCATION_FAILED).and()
