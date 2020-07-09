@@ -2,7 +2,7 @@ package guru.sfg.beer.order.service.sm;
 
 import guru.sfg.beer.order.service.domain.BeerOrderEventEnum;
 import guru.sfg.beer.order.service.domain.BeerOrderStatusEnum;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -34,18 +34,23 @@ import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATED;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATION_EXCEPTION;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATION_PENDING;
 
-@RequiredArgsConstructor
 @Configuration
 @EnableStateMachineFactory
 public class BeerOrderStateMachineConfig
 		extends StateMachineConfigurerAdapter<BeerOrderStatusEnum, BeerOrderEventEnum> {
 
-	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateOrderAction;
-	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocateOrderAction;
-	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateFailureAction;
-	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> validatePassedAction;
-	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocationFailureAction;
-	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> deallocateOrderAction;
+	@Autowired
+	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateOrderAction;
+	@Autowired
+	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocateOrderAction;
+	@Autowired
+	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateFailureAction;
+	@Autowired
+	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> validatePassedAction;
+	@Autowired
+	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocationFailureAction;
+	@Autowired
+	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> deallocateOrderAction;
 
 	@Override
 	public void configure(StateMachineStateConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> states) throws Exception {

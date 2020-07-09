@@ -14,26 +14,31 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class BeerOrderValidationListener {
-
 	private final JmsTemplate jmsTemplate;
 
 	@JmsListener(destination = JmsConfig.VALIDATE_ORDER_QUEUE)
 	public void list(Message msg) {
 		boolean isValid = true;
+		boolean sendResponse = true;
 
 		ValidateOrderRequest request = (ValidateOrderRequest) msg.getPayload();
-		log.debug("Validate order test listener for order [{}]", request.getBeerOrderDto().getId());
+		log.debug("Validate order test listener for order [{}]", request.getBeerOrder().getId());
 
 		// condition to fail validation
-		if ("fail-validation".equals(request.getBeerOrderDto().getCustomerRef())) {
-			log.debug("Order is not valid");
-			isValid = false;
+		if (request.getBeerOrder().getCustomerRef() != null) {
+			if (request.getBeerOrder().getCustomerRef().equals("fail-validation")) {
+				isValid = false;
+			} else if (request.getBeerOrder().getCustomerRef().equals("dont-validate")) {
+				sendResponse = false;
+			}
 		}
 
-		jmsTemplate.convertAndSend(JmsConfig.VALIDATE_ORDER_RESPONSE_QUEUE,
-				ValidateOrderResult.builder()
-						.isValid(isValid)
-						.orderId(request.getBeerOrderDto().getId())
-						.build());
+		if (sendResponse) {
+			jmsTemplate.convertAndSend(JmsConfig.VALIDATE_ORDER_RESPONSE_QUEUE,
+					ValidateOrderResult.builder()
+							.isValid(isValid)
+							.orderId(request.getBeerOrder().getId())
+							.build());
+		}
 	}
 }
