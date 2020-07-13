@@ -6,8 +6,8 @@ import guru.sfg.beer.order.service.domain.BeerOrderStatusEnum;
 import guru.sfg.beer.order.service.repositories.BeerOrderRepository;
 import guru.sfg.beer.order.service.sm.BeerOrderStateChangeInterceptor;
 import guru.sfg.brewery.model.BeerOrderDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.ALLOCATE_ORDER;
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.ALLOCATION_FAILED;
@@ -27,22 +29,22 @@ import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.ALLOCATION_S
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.VALIDATE_ORDER;
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.VALIDATION_FAILED;
 import static guru.sfg.beer.order.service.domain.BeerOrderEventEnum.VALIDATION_PASSED;
+import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.ALLOCATED;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.NEW;
+import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.PENDING_INVENTORY;
+import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATED;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class BeerOrderManagerImpl implements BeerOrderManager {
 
 	public static final String ORDER_ID_HEADER = "beer_order_id_header";
 
-	@Autowired
-	private StateMachineFactory<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineFactory;
-	@Autowired
-	private BeerOrderRepository beerOrderRepository;
-	@Autowired
-	private BeerOrderStateChangeInterceptor beerOrderStateChangeInterceptor;
-	@Autowired
-	private EntityManager entityManager;
+	private final StateMachineFactory<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineFactory;
+	private final BeerOrderRepository beerOrderRepository;
+	private final BeerOrderStateChangeInterceptor beerOrderStateChangeInterceptor;
+	private final EntityManager entityManager;
 
 	@Transactional
 	@Override
@@ -69,8 +71,10 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
 			if (isValid) {
 				log.debug("Order is valid");
 				sendBeerOrderEvent(beerOrder, VALIDATION_PASSED);
-//				BeerOrder validatedOrder = beerOrderRepository.findById(beerOrderId).get();
-//				sendBeerOrderEvent(validatedOrder, ALLOCATE_ORDER);
+				//wait for status change
+				awaitForStatus(beerOrderId, VALIDATED);
+				BeerOrder validatedOrder = beerOrderRepository.findById(beerOrderId).get();
+				sendBeerOrderEvent(validatedOrder, ALLOCATE_ORDER);
 			} else {
 				log.debug("Order is not valid");
 				sendBeerOrderEvent(beerOrder, VALIDATION_FAILED);
@@ -95,6 +99,7 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
 
 		beerOrderOptional.ifPresentOrElse(beerOrder -> {
 			sendBeerOrderEvent(beerOrder, ALLOCATION_SUCCESS);
+			awaitForStatus(beerOrder.getId(), ALLOCATED);
 			updateAllocatedQty(beerOrderDto);
 		}, () -> log.error("Order Id Not Found: {}", beerOrderDto.getId()));
 	}
@@ -106,7 +111,7 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
 
 		beerOrderOptional.ifPresentOrElse(beerOrder -> {
 			sendBeerOrderEvent(beerOrder, ALLOCATION_NO_INVENTORY);
-
+			awaitForStatus(beerOrder.getId(), PENDING_INVENTORY);
 			updateAllocatedQty(beerOrderDto);
 		}, () -> log.error("Order Id Not Found: {}", beerOrderDto.getId()));
 	}
@@ -164,6 +169,40 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
 				.setHeader(ORDER_ID_HEADER, beerOrder.getId().toString())
 				.build();
 		sm.sendEvent(msg);
+	}
+
+	private void awaitForStatus(UUID beerOrderId, BeerOrderStatusEnum statusEnum) {
+
+		AtomicBoolean found = new AtomicBoolean(false);
+		AtomicInteger loopCount = new AtomicInteger(0);
+
+		while (!found.get()) {
+			if (loopCount.incrementAndGet() > 10) {
+				found.set(true);
+				log.debug("Loop Retries exceeded");
+			}
+
+			beerOrderRepository.findById(beerOrderId).ifPresentOrElse(beerOrder -> {
+				if (beerOrder.getOrderStatus().equals(statusEnum)) {
+					found.set(true);
+					log.debug("Order Found");
+				} else {
+					log.debug("Order Status Not Equal. Expected: {}, Found: {}",
+							statusEnum.name(), beerOrder.getOrderStatus().name());
+				}
+			}, () -> {
+				log.debug("Order Id Not Found");
+			});
+
+			if (!found.get()) {
+				try {
+					log.debug("Sleeping for retry");
+					Thread.sleep(100);
+				} catch (Exception e) {
+					// do nothing
+				}
+			}
+		}
 	}
 
 	private StateMachine<BeerOrderStatusEnum, BeerOrderEventEnum> build(BeerOrder beerOrder) {

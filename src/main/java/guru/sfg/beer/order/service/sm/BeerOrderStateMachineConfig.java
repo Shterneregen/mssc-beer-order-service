@@ -2,7 +2,7 @@ package guru.sfg.beer.order.service.sm;
 
 import guru.sfg.beer.order.service.domain.BeerOrderEventEnum;
 import guru.sfg.beer.order.service.domain.BeerOrderStatusEnum;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -34,23 +34,17 @@ import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATED;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATION_EXCEPTION;
 import static guru.sfg.beer.order.service.domain.BeerOrderStatusEnum.VALIDATION_PENDING;
 
+@RequiredArgsConstructor
 @Configuration
 @EnableStateMachineFactory
 public class BeerOrderStateMachineConfig
 		extends StateMachineConfigurerAdapter<BeerOrderStatusEnum, BeerOrderEventEnum> {
 
-	@Autowired
-	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateOrderAction;
-	@Autowired
-	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocateOrderAction;
-	@Autowired
-	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateFailureAction;
-	@Autowired
-	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> validatePassedAction;
-	@Autowired
-	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocationFailureAction;
-	@Autowired
-	private Action<BeerOrderStatusEnum, BeerOrderEventEnum> deallocateOrderAction;
+	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateOrderAction;
+	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocateOrderAction;
+	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> validateFailureAction;
+	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> allocationFailureAction;
+	private final Action<BeerOrderStatusEnum, BeerOrderEventEnum> deallocateOrderAction;
 
 	@Override
 	public void configure(StateMachineStateConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> states) throws Exception {
@@ -69,7 +63,7 @@ public class BeerOrderStateMachineConfig
 	public void configure(StateMachineTransitionConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> transitions) throws Exception {
 		transitions
 				.withExternal().source(NEW).target(VALIDATION_PENDING).event(VALIDATE_ORDER).action(validateOrderAction).and()
-				.withExternal().source(VALIDATION_PENDING).target(VALIDATED).event(VALIDATION_PASSED).action(validatePassedAction).and()
+				.withExternal().source(VALIDATION_PENDING).target(VALIDATED).event(VALIDATION_PASSED).and()
 				.withExternal().source(VALIDATION_PENDING).target(CANCELLED).event(CANCEL_ORDER).and()
 				.withExternal().source(VALIDATION_PENDING).target(VALIDATION_EXCEPTION).event(VALIDATION_FAILED).action(validateFailureAction).and()
 				.withExternal().source(VALIDATED).target(ALLOCATION_PENDING).event(ALLOCATE_ORDER).action(allocateOrderAction).and()
