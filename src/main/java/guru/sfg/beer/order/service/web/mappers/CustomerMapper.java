@@ -4,7 +4,7 @@ import guru.sfg.beer.order.service.domain.Customer;
 import guru.sfg.brewery.model.CustomerDto;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", uses = {DateMapper.class})
+@Mapper(uses = {DateMapper.class})
 public interface CustomerMapper {
 	CustomerDto customerToDto(Customer customer);
 

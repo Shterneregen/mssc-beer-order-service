@@ -63,6 +63,11 @@ dependencies {
     )
 }
 
+compileJava {
+    options.annotationProcessorPath = configurations.annotationProcessor
+    options.compilerArgs << "-Amapstruct.defaultComponentModel=spring"
+}
+
 test {
     useJUnitPlatform()
 }
