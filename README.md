@@ -1,7 +1,12 @@
 [![CircleCI](https://circleci.com/gh/Shterneregen/mssc-beer-order-service.svg?style=svg)](https://circleci.com/gh/Shterneregen/mssc-beer-order-service)
 # MSSC Beer Order Service
 
-Spring Boot Microservice example
+| Services                                                                                   |
+| ------------------------------------------------------------------------------------------ |
+| [MSSC Beer Inventory Service](https://github.com/Shterneregen/mssc-beer-inventory-service) |
+| [MSSC Beer Service](https://github.com/Shterneregen/mssc-beer-service)                     |
+| [MSSC Beer Order Service](https://github.com/Shterneregen/mssc-beer-service)               |
+| [SFG Brewery Gateway Service](https://github.com/Shterneregen/mssc-brewery-gateway)        |
 
 ---
 * Original repo:
