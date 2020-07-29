@@ -9,6 +9,7 @@ ext {
     mapstructVersion = "1.3.1.Final"
     mockitoVersion = "3.3.3"
     mysqlConnectorJavaVersion = "8.0.16"
+    springCloudVersion = "Hoxton.SR6"
 }
 
 group = "guru.springframework"
@@ -34,6 +35,7 @@ dependencies {
             "org.springframework.boot:spring-boot-starter-artemis",
             "org.springframework.boot:spring-boot-starter-data-jpa",
             "org.springframework.boot:spring-boot-starter-web",
+            "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client",
             "org.mapstruct:mapstruct:$mapstructVersion",
             "org.springframework.statemachine:spring-statemachine-core:2.2.0.RELEASE"
     )
@@ -66,6 +68,12 @@ dependencies {
 compileJava {
     options.annotationProcessorPath = configurations.annotationProcessor
     options.compilerArgs << "-Amapstruct.defaultComponentModel=spring"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 test {
