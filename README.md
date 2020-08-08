@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/Shterneregen/mssc-beer-order-service.svg?style=svg)](https://circleci.com/gh/Shterneregen/mssc-beer-order-service)
 # MSSC Beer Order Service
 
-| Services                                                                                   |Port|
+| Service                                                                                    |Port|
 | ------------------------------------------------------------------------------------------ |----|
 | [MSSC Beer Service](https://github.com/Shterneregen/mssc-beer-service)                     |8080|
 | [MSSC Beer Order Service](https://github.com/Shterneregen/mssc-beer-service)               |8081|
