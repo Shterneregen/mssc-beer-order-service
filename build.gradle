@@ -1,81 +1,83 @@
 plugins {
-    id "java"
-    id "org.springframework.boot" version "2.3.0.RELEASE"
-    id "io.spring.dependency-management" version "1.0.9.RELEASE"
-    id "net.ltgt.apt" version "0.20"
-}
-
-ext {
-    mapstructVersion = "1.3.1.Final"
-    mockitoVersion = "3.3.3"
-    mysqlConnectorJavaVersion = "8.0.16"
-    springCloudVersion = "Hoxton.SR6"
+	id "org.springframework.boot" version "2.3.2.RELEASE"
+	id "io.spring.dependency-management" version "1.0.9.RELEASE"
+	id "net.ltgt.apt" version "0.20"
+	id "java"
 }
 
 group = "guru.springframework"
 version = "0.0.1-SNAPSHOT"
-description = "mssc-beer-order-service"
 sourceCompatibility = "11"
 
+ext {
+	set("mapstructVersion", "1.3.1.Final")
+	set("mockitoVersion", "3.3.3")
+	set("mysqlConnectorJavaVersion", "8.0.16")
+	set("springCloudVersion", "Hoxton.SR6")
+	set("artemisJmsServerVersion", "2.12.0")
+	set("awaitilityVersion", "3.1.6")
+	set("wiremockExtensionVersion", "0.4.0")
+	set("springStatemachineCoreVersion", "2.2.0.RELEASE")
+}
+
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
 
 repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url 'https://jitpack.io' }
+	mavenCentral()
+	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    implementation(
-            "org.springframework.boot:spring-boot-starter-actuator",
-            "org.springframework.boot:spring-boot-starter-artemis",
-            "org.springframework.boot:spring-boot-starter-data-jpa",
-            "org.springframework.boot:spring-boot-starter-web",
-            "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client",
-            "org.mapstruct:mapstruct:$mapstructVersion",
-            "org.springframework.statemachine:spring-statemachine-core:2.2.0.RELEASE"
-    )
-    compileOnly "org.projectlombok:lombok"
-    runtimeOnly(
-            "org.springframework.boot:spring-boot-devtools",
-            "com.h2database:h2",
-            "mysql:mysql-connector-java:$mysqlConnectorJavaVersion"
-    )
-    annotationProcessor(
-            "org.projectlombok:lombok",
-            "org.mapstruct:mapstruct-processor:$mapstructVersion"
-    )
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude group: "org.junit.vintage", module: "junit-vintage-engine"
-    }
-    testImplementation(
-            "org.mockito:mockito-junit-jupiter:$mockitoVersion",
-            "org.apache.activemq:artemis-jms-server:2.12.0",
-            "org.awaitility:awaitility:3.1.6",
-            "org.projectlombok:lombok",
-            "com.github.jenspiegsa:wiremock-extension:0.4.0"
-    )
-    testAnnotationProcessor(
-            "org.projectlombok:lombok",
-            "org.mapstruct:mapstruct-processor:$mapstructVersion"
-    )
+	implementation(
+			"org.springframework.boot:spring-boot-starter-actuator",
+			"org.springframework.boot:spring-boot-starter-artemis",
+			"org.springframework.boot:spring-boot-starter-data-jpa",
+			"org.springframework.boot:spring-boot-starter-web",
+			"org.springframework.cloud:spring-cloud-starter-netflix-eureka-client",
+			"org.mapstruct:mapstruct:$mapstructVersion",
+			"org.springframework.statemachine:spring-statemachine-core:$springStatemachineCoreVersion"
+	)
+	compileOnly "org.projectlombok:lombok"
+	runtimeOnly(
+			"org.springframework.boot:spring-boot-devtools",
+			"com.h2database:h2",
+			"mysql:mysql-connector-java:$mysqlConnectorJavaVersion"
+	)
+	annotationProcessor(
+			"org.projectlombok:lombok",
+			"org.mapstruct:mapstruct-processor:$mapstructVersion"
+	)
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+	}
+	testImplementation(
+			"org.mockito:mockito-junit-jupiter:$mockitoVersion",
+			"org.apache.activemq:artemis-jms-server:$artemisJmsServerVersion",
+			"org.awaitility:awaitility:$awaitilityVersion",
+			"org.projectlombok:lombok",
+			"com.github.jenspiegsa:wiremock-extension:$wiremockExtensionVersion"
+	)
+	testAnnotationProcessor(
+			"org.projectlombok:lombok",
+			"org.mapstruct:mapstruct-processor:$mapstructVersion"
+	)
 }
 
 compileJava {
-    options.annotationProcessorPath = configurations.annotationProcessor
-    options.compilerArgs << "-Amapstruct.defaultComponentModel=spring"
+	options.annotationProcessorPath = configurations.annotationProcessor
+	options.compilerArgs << "-Amapstruct.defaultComponentModel=spring"
 }
 
 dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 test {
-    useJUnitPlatform()
+	useJUnitPlatform()
 }
