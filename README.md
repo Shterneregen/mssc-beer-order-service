@@ -11,6 +11,29 @@
 | [SFG Brewery Eureka Service](https://github.com/Shterneregen/mssc-brewery-eureka)          | 8761   |
 | [SFG Brewery Configuration Service](https://github.com/Shterneregen/mssc-config-server)    | 8888   |
 | [SFG Brewery Configuration Repo](https://github.com/Shterneregen/mssc-brewery-config-repo) | GitHub |
+| ActiveMQ Artemis                                                                           | 8161   |
+| Zipkin Server                                                                              | 9411   |
+
+---
+For this service should be up:
+* [SFG Brewery Eureka Service](https://github.com/Shterneregen/mssc-brewery-eureka)
+* [SFG Brewery Configuration Service](https://github.com/Shterneregen/mssc-config-server)
+* [MSSC Beer Service](https://github.com/Shterneregen/mssc-beer-service)
+* [MSSC Beer Inventory Service](https://github.com/Shterneregen/mssc-beer-inventory-service)
+* ActiveMQ Artemis
+* Zipkin
+
+---
+[Dockerfile for the ActiveMQ Artemis Project](https://github.com/vromero/activemq-artemis-docker)
+```console
+docker run -d -p 8161:8161 -p 61616:61616 --name artemis vromero/activemq-artemis
+``` 
+Credentials: `artemis` / `simetraehcapa`
+
+[Zipkin Quickstart](https://zipkin.io/pages/quickstart)
+```console
+docker run -d -p 9411:9411 --name zipkin openzipkin/zipkin
+``` 
 
 ---
 * Original repo:
